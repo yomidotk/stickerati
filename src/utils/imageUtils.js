@@ -1,16 +1,53 @@
 import { removeBackground as imglyRemoveBackground } from '@imgly/background-removal';
 
 /**
+ * Resizes and compresses an image to improve processing speed.
+ * @param {File|Blob} file 
+ * @param {number} maxDimension 
+ * @returns {Promise<Blob>}
+ */
+export async function compressImage(file, maxDimension = 800) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      
+      if (width > maxDimension || height > maxDimension) {
+        const scale = maxDimension / Math.max(width, height);
+        width = Math.floor(width * scale);
+        height = Math.floor(height * scale);
+      }
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, 'image/webp', 0.9); // Use WebP for optimal compression
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+/**
  * Removes the background from a given image file.
  * The processing runs completely client-side using @imgly/background-removal.
- * @param {File} file 
+ * @param {Blob|File} file 
  * @returns {Promise<string>} Object URL of the resulting transparent PNG blob
  */
 export async function removeBackground(file) {
   try {
-    // Using default config which downloads models from unpkg/imgly CDN,
-    // but the actual image processing happens 100% locally in the browser via WebAssembly.
-    const blob = await imglyRemoveBackground(file);
+    const config = {
+      model: 'isnet', // Use the highest quality model available
+      rescale: false  // Disable internal downscaling since we already compressed it to a good size
+    };
+    const blob = await imglyRemoveBackground(file, config);
     return URL.createObjectURL(blob);
   } catch (error) {
     console.error('Error removing background:', error);

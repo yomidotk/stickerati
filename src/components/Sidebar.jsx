@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { removeBackground, addWhiteBorder } from '../utils/imageUtils';
+import { removeBackground, addWhiteBorder, compressImage } from '../utils/imageUtils';
 import { Upload, Loader2, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const COLORS = ['#ffffff', '#fef08a', '#ffedd5', '#dcfce7', '#e2e8f0']; // White, Yellow Notepad, Kraft, Mint, Slate
@@ -19,7 +19,13 @@ export default function Sidebar({ onStickerProcessed, onExport, sheetColor, setS
 
       for (let i = 0; i < acceptedFiles.length; i++) {
         const file = acceptedFiles[i];
-        const url = await removeBackground(file);
+        
+        // 1. Compress the image locally to max 800px before sending it to the heavy AI model
+        // This vastly speeds up processing and prevents crashes on large 4k images.
+        const optimizedFile = await compressImage(file, 800);
+        
+        // 2. Remove the background using the high quality 'isnet' model
+        const url = await removeBackground(optimizedFile);
         const borderUrl = await addWhiteBorder(url, 20); // 20px thick border
         
         // Determine natural dimensions to avoid stretching
