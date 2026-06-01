@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-neutral-50 text-slate-800 antialiased;
+    font-family: 'Helvetica Now Condensed', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;
+  }
+}
+
+@layer utilities {
+  .bg-grid-pattern {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(0, 150, 255, 0.15) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 150, 255, 0.15) 1px, transparent 1px);
+    background-color: #f8fafc;
+  }
+
+  .font-computer {
+    font-family: 'Computer Say No', 'Courier New', Courier, monospace;
+  }
+  
+  .font-helvetica-condensed {
+    font-family: 'Helvetica Now Condensed', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;
+  }
+}
+
+/* Custom Scrollbar for aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Float animations for stickers */
+@keyframes float-1 {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-15px) rotate(-2deg); }
+}
+@keyframes float-2 {
+  0%, 100% { transform: translateY(0) rotate(5deg); }
+  50% { transform: translateY(-10px) rotate(8deg); }
+}
+@keyframes float-3 {
+  0%, 100% { transform: translateY(0) rotate(10deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+.animate-float-1 { animation: float-1 4s ease-in-out infinite; }
+.animate-float-2 { animation: float-2 5s ease-in-out infinite; }
+.animate-float-3 { animation: float-3 3.5s ease-in-out infinite; }
